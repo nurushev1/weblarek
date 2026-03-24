@@ -32,24 +32,18 @@ export interface IProductsResponse {
   items: IProduct[];
 }
 
-export type IProductResponse = IProduct | IOrderError;
+export interface IProductResponse extends IProduct {};
 
 export interface IOrderRequest {
-  payment: TPayment | "online";
+  payment: TPayment;
   email: string;
   phone: string;
-  address?: string;
+  address: string;
   total: number;
   items: string[];
 }
 
-export interface IOrderSuccess {
+export interface IOrderResponse {
   id: string;
   total: number;
 }
-
-export interface IOrderError {
-  error: string;
-}
-
-export type IOrderResponse = IOrderSuccess | IOrderError;

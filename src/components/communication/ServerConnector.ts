@@ -2,16 +2,14 @@ import {
   IProductsResponse,
   IProductResponse,
   IOrderRequest,
-  IOrderSuccess,
-  IOrderError,
   IOrderResponse,
-} from "../../../types";
-import { Api } from "../Api";
+} from "../../types";
+import { IApi } from "../../types";
 
 export class ServerConnector {
-  private api: Api;
+  private api: IApi;
 
-  constructor(api: Api) {
+  constructor(api: IApi) {
     this.api = api;
   }
 

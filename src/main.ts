@@ -1,10 +1,11 @@
 import "./scss/styles.scss";
-import { ProductCatalog } from "./components/base/Models/ProductCatalog";
-import { Cart } from "./components/base/Models/Cart";
-import { Buyer } from "./components/base/Models/Buyer";
-import { ServerConnector } from "./components/base/communication/ServerConnector";
+import { ProductCatalog } from "./components/Models/ProductCatalog";
+import { Cart } from "./components/Models/Cart";
+import { Buyer } from "./components/Models/Buyer";
+import { ServerConnector } from "./components/communication/ServerConnector";
 import { Api } from "./components/base/Api";
 import { apiProducts } from "./utils/data";
+import { API_URL } from "./utils/constants";
 
 const productCatalog = new ProductCatalog();
 const cart = new Cart();
@@ -64,7 +65,7 @@ console.log("Проверка методов setData и getData: ", buyer.getDat
 console.log("Проверка метода clearData: ", buyer.clearData(), buyer.getData());
 console.log("Проверка метода validateData: ", buyer.validateData());
 
-const api = new Api("https://larek-api.nomoreparties.co");
+const api = new Api(API_URL);
 const serverConnector = new ServerConnector(api);
 
 serverConnector
