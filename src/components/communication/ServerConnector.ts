@@ -1,6 +1,5 @@
 import {
   IProductsResponse,
-  IProductResponse,
   IOrderRequest,
   IOrderResponse,
 } from "../../types";

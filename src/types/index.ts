@@ -1,4 +1,5 @@
 export type ApiPostMethods = "POST" | "PUT" | "DELETE";
+export type { IEvents } from '../components/base/Events';
 
 export interface IApi {
   get<T extends object>(uri: string): Promise<T>;
@@ -31,8 +32,6 @@ export interface IProductsResponse {
   total: number;
   items: IProduct[];
 }
-
-export interface IProductResponse extends IProduct {};
 
 export interface IOrderRequest {
   payment: TPayment;

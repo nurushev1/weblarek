@@ -1,4 +1,5 @@
 import { IBuyer, TPayment } from "../../types";
+import { IEvents } from "../base/Events";
 
 export class Buyer {
   private payment: TPayment;
@@ -6,7 +7,11 @@ export class Buyer {
   private email: string;
   private phone: string;
 
-  constructor() {
+  private events: IEvents;
+
+  constructor(events: IEvents) {
+    this.events = events;
+
     this.payment = "";
     this.address = "";
     this.email = "";
@@ -29,6 +34,8 @@ export class Buyer {
     if (data.phone !== undefined) {
       this.phone = data.phone;
     }
+
+    this.events.emit("buyer:changed", this.getData());
   }
 
   getData(): IBuyer {
@@ -45,10 +52,13 @@ export class Buyer {
     this.address = "";
     this.email = "";
     this.phone = "";
+
+    this.events.emit("buyer:changed", this.getData());
   }
 
   validateData(): Partial<Record<keyof IBuyer, string>> {
-    let result: Partial<Record<keyof IBuyer, string>> = {};
+    const result: Partial<Record<keyof IBuyer, string>> = {};
+
     if (this.payment === "") {
       result.payment = "Не выбран вид оплаты";
     }
@@ -64,6 +74,7 @@ export class Buyer {
     if (this.phone === "") {
       result.phone = "Укажите номер телефона";
     }
+
     return result;
   }
 }
