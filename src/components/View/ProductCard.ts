@@ -1,5 +1,6 @@
 import { Component } from '../base/Component';
 import { ensureElement } from '../../utils/utils';
+import { CDN_URL } from '../../utils/constants';
 
 interface IProductCard {
   title: string;
@@ -41,10 +42,6 @@ export abstract class ProductCard extends Component<IProductCard> {
   }
 
   set image(value: string) {
-    this.setImage(
-      this.imageElement,
-      value,
-      this.titleElement.textContent || ''
-    );
-  }
+    this.imageElement.src = CDN_URL + value;
+  };
 }

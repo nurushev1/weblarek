@@ -23,6 +23,7 @@ import { ContactsForm } from './components/View/ContactsForm';
 
 import { IProduct } from './types';
 import { TPayment } from './types';
+import { CDN_URL } from './utils/constants';
 
 const events = new EventEmitter();
 
@@ -37,15 +38,24 @@ const gallery = new Gallery(ensureElement<HTMLElement>('.gallery'));
 
 const modal = new Modal(ensureElement<HTMLElement>('.modal'), events);
 
-const basket = new Basket(ensureElement<HTMLElement>('.basket'), events);
+const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 
-const orderForm = new OrderForm(
-  ensureElement<HTMLFormElement>('form[name="order"]'),
+const basket = new Basket(
+  basketTemplate.content.firstElementChild!.cloneNode(true) as HTMLElement,
   events
 );
 
+const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
+
+const orderForm = new OrderForm(
+  orderTemplate.content.firstElementChild!.cloneNode(true) as HTMLFormElement,
+  events
+);
+
+const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+
 const contactsForm = new ContactsForm(
-  ensureElement<HTMLFormElement>('form[name="contacts"]'),
+  contactsTemplate.content.firstElementChild!.cloneNode(true) as HTMLFormElement,
   events
 );
 
@@ -74,11 +84,10 @@ events.on('card:select', (product: IProduct) => {
   events.emit('product:selected', product);
 });
 
-events.on('product:selected', (product: IProduct) => {
-  const template = document.getElementById(
-    'card-preview'
-  ) as HTMLTemplateElement;
 
+
+events.on('product:selected', (product: IProduct) => {
+  const template = document.getElementById('card-preview') as HTMLTemplateElement;
   const el = template.content.firstElementChild!.cloneNode(true) as HTMLElement;
 
   const preview = new PreviewCard(el, events);
@@ -86,12 +95,14 @@ events.on('product:selected', (product: IProduct) => {
   preview.id = product.id;
   preview.title = product.title;
   preview.price = product.price;
-  preview.image = product.image;
+  preview.image = CDN_URL + product.image;
   preview.inCart = cart.hasProduct(product.id);
 
   modal.content = preview.render();
   modal.open();
 });
+
+
 
 events.on('product:toggle', ({ id }: { id: string }) => {
   const product = catalog.getProductById(id);

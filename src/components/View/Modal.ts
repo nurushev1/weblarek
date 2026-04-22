@@ -2,11 +2,7 @@ import { Component } from '../base/Component';
 import { ensureElement } from '../../utils/utils';
 import { IEvents } from '../base/Events';
 
-interface IModal {
-  content: HTMLElement;
-}
-
-export class Modal extends Component<IModal> {
+export class Modal extends Component<unknown> {
   protected contentElement: HTMLElement;
   protected closeButton: HTMLButtonElement;
   protected events: IEvents;
@@ -16,7 +12,7 @@ export class Modal extends Component<IModal> {
 
     this.events = events;
 
-    this.contentElement = ensureElement<HTMLElement>(
+    this.contentElement = ensureElement(
       '.modal__content',
       this.container
     );
@@ -26,12 +22,10 @@ export class Modal extends Component<IModal> {
       this.container
     );
 
-    this.closeButton.addEventListener('click', () => {
-      this.close();
-    });
+    this.closeButton.addEventListener('click', () => this.close());
 
-    this.container.addEventListener('click', (event) => {
-      if (event.target === this.container) {
+    this.container.addEventListener('click', (e) => {
+      if (e.target === this.container) {
         this.close();
       }
     });

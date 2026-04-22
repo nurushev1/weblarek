@@ -8,11 +8,6 @@ interface ICardActions {
   onClick?: (event: MouseEvent) => void;
 }
 
-export type TCardCatalog = {
-  category: string;
-  image: string;
-};
-
 export class CardCatalog extends ProductCard {
   protected categoryElement: HTMLElement;
 
@@ -32,11 +27,14 @@ export class CardCatalog extends ProductCard {
   set category(value: string) {
     this.categoryElement.textContent = value;
 
-    for (const key in categoryMap) {
-      this.categoryElement.classList.toggle(
-        categoryMap[key as CategoryKey],
-        key === value
-      );
+    Object.values(categoryMap).forEach((className) => {
+      this.categoryElement.classList.remove(className);
+    });
+
+    const key = value as CategoryKey;
+
+    if (categoryMap[key]) {
+      this.categoryElement.classList.add(categoryMap[key]);
     }
   }
 }

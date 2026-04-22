@@ -5,7 +5,7 @@ import { IEvents } from '../../types';
 export class BasketCard extends ProductCard {
   protected indexElement: HTMLElement;
   protected deleteButton: HTMLButtonElement;
-  protected _id!: string;
+  protected _id: string = '';
   protected events: IEvents;
 
   constructor(container: HTMLElement, events: IEvents) {
@@ -24,6 +24,7 @@ export class BasketCard extends ProductCard {
     );
 
     this.deleteButton.addEventListener('click', () => {
+      if (!this._id) return;
       this.events.emit('basket:remove', { id: this._id });
     });
   }

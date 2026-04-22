@@ -2,14 +2,9 @@ import { ProductCard } from './ProductCard';
 import { ensureElement } from '../../utils/utils';
 import { IEvents } from '../../types';
 
-export type TPreviewCard = {
-  id: string;
-  inCart: boolean;
-};
-
 export class PreviewCard extends ProductCard {
   protected button: HTMLButtonElement;
-  protected _id!: string;
+  protected _id: string = '';
   protected events: IEvents;
 
   constructor(container: HTMLElement, events: IEvents) {
@@ -23,6 +18,8 @@ export class PreviewCard extends ProductCard {
     );
 
     this.button.addEventListener('click', () => {
+      if (!this._id) return;
+
       this.events.emit('product:toggle', { id: this._id });
     });
   }
