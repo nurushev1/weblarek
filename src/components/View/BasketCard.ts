@@ -1,39 +1,23 @@
-import { ProductCard } from './ProductCard';
-import { ensureElement } from '../../utils/utils';
-import { IEvents } from '../../types';
+import { IProduct } from "../../types";
+import { ensureElement } from "../../utils/utils";
+import { IEvents } from "../base/Events";
+import { ProductCard } from "./ProductCard";
 
 export class BasketCard extends ProductCard {
-  protected indexElement: HTMLElement;
-  protected deleteButton: HTMLButtonElement;
-  protected _id: string = '';
-  protected events: IEvents;
+  protected cardIndexElement: HTMLElement;
+  protected cardButtonRemoveElement: HTMLButtonElement;
 
-  constructor(container: HTMLElement, events: IEvents) {
-    super(container);
+  constructor(protected events: IEvents, onRemoveClick: () => void) {
+    super(events, "#card-basket");
 
-    this.events = events;
-
-    this.indexElement = ensureElement<HTMLElement>(
-      '.basket__item-index',
-      this.container
-    );
-
-    this.deleteButton = ensureElement<HTMLButtonElement>(
-      '.basket__item-delete',
-      this.container
-    );
-
-    this.deleteButton.addEventListener('click', () => {
-      if (!this._id) return;
-      this.events.emit('basket:remove', { id: this._id });
-    });
+    this.cardIndexElement = ensureElement<HTMLElement>(".basket__item-index", this.container);
+    this.cardButtonRemoveElement = ensureElement<HTMLButtonElement>(".basket__item-delete", this.container);
+    this.cardButtonRemoveElement.addEventListener("click", onRemoveClick);
   }
 
-  set id(value: string) {
-    this._id = value;
-  }
-
-  set index(value: number) {
-    this.indexElement.textContent = String(value);
+  render(product: IProduct & { index?: number }): HTMLElement {
+    this.renderBase(product);
+    this.cardIndexElement.textContent = String((product.index || 0) + 1);
+    return this.container;
   }
 }

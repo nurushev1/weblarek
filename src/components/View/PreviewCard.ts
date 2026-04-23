@@ -1,36 +1,42 @@
-import { ProductCard } from './ProductCard';
-import { ensureElement } from '../../utils/utils';
-import { IEvents } from '../../types';
+import { ensureElement } from "../../utils/utils";
+import { IEvents } from "../base/Events";
+import { ProductCard } from "./ProductCard";
+import { IProduct } from "../../types";
+import { categoryMap, CDN_URL } from "../../utils/constants";
 
 export class PreviewCard extends ProductCard {
-  protected button: HTMLButtonElement;
-  protected _id: string = '';
-  protected events: IEvents;
+  protected category: HTMLElement;
+  protected image: HTMLImageElement;
+  protected description: HTMLElement;
+  protected cardButtonElement: HTMLButtonElement;
 
-  constructor(container: HTMLElement, events: IEvents) {
-    super(container);
+  constructor(protected events: IEvents, onButtonClick: () => void) {
+    super(events, "#card-preview");
 
-    this.events = events;
+    this.image = ensureElement<HTMLImageElement>(".card__image", this.container);
+    this.category = ensureElement<HTMLElement>(".card__category", this.container);
+    this.description = ensureElement<HTMLElement>(".card__text", this.container);
+    this.cardButtonElement = ensureElement<HTMLButtonElement>(".card__button", this.container);
 
-    this.button = ensureElement<HTMLButtonElement>(
-      '.card__button',
-      this.container
-    );
-
-    this.button.addEventListener('click', () => {
-      if (!this._id) return;
-
-      this.events.emit('product:toggle', { id: this._id });
-    });
+    this.cardButtonElement.addEventListener("click", onButtonClick);
   }
 
-  set id(value: string) {
-    this._id = value;
+  render(product: IProduct): HTMLElement {
+    this.renderBase(product);
+
+    this.category.className = `card__category ${categoryMap[product.category as keyof typeof categoryMap]}`;
+    this.category.textContent = product.category;
+    this.setImage(this.image, `${CDN_URL}/${product.image}`, product.title);
+
+    this.description.textContent = product.description;
+    return this.container;
   }
 
-  set inCart(value: boolean) {
-    this.button.textContent = value
-      ? 'Удалить из корзины'
-      : 'В корзину';
+  setButtonText(text: string): void {
+    this.cardButtonElement.textContent = text;
+  }
+
+  setButtonDisabled(disabled: boolean): void {
+    this.cardButtonElement.disabled = disabled;
   }
 }

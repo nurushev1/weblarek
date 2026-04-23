@@ -1,53 +1,56 @@
-import { Component } from '../base/Component';
-import { ensureElement } from '../../utils/utils';
-import { IEvents } from '../base/Events';
+import { ensureElement } from "../../utils/utils";
+import { EventEmitter } from "../base/Events";
+import { Component } from "../base/Component";
 
-interface IBasket {
-  items: HTMLElement[];
-  total: number;
-  disabled: boolean;
+interface IBasketData {
+  items: HTMLElement[],
+  total: number
 }
 
-export class Basket extends Component<IBasket> {
-  protected listElement: HTMLElement;
-  protected priceElement: HTMLElement;
-  protected button: HTMLButtonElement;
-  protected events: IEvents;
+export class Basket extends Component<IBasketData> {
+  protected basketListElement: HTMLElement
+  protected basketPriceElement: HTMLElement
+  protected basketTitleElement: HTMLElement
+  protected basketButtonOrderElement: HTMLButtonElement
 
-  constructor(container: HTMLElement, events: IEvents) {
-    super(container);
+  constructor(container: HTMLElement, protected events: EventEmitter) {
+    super(container)
 
-    this.events = events;
-
-    this.listElement = ensureElement<HTMLElement>(
-      '.basket__list',
-      this.container
-    );
-
-    this.priceElement = ensureElement<HTMLElement>(
-      '.basket__price',
-      this.container
-    );
-
-    this.button = ensureElement<HTMLButtonElement>(
+    this.basketButtonOrderElement = ensureElement<HTMLButtonElement>(
       '.basket__button',
       this.container
     );
-
-    this.button.addEventListener('click', () => {
-      this.events.emit('order:start');
+    this.basketTitleElement = ensureElement<HTMLElement>(
+      '.modal__title',
+      this.container
+    );
+    this.basketPriceElement = ensureElement<HTMLElement>(
+      '.basket__price',
+      this.container
+    );
+    this.basketListElement = ensureElement<HTMLElement>(
+      '.basket__list',
+      this.container
+    );
+    this.items = []
+    this.basketButtonOrderElement.addEventListener('click', () => {
+      this.events.emit('basket:order')
     });
   }
 
-  set items(items: HTMLElement[]) {
-    this.listElement.replaceChildren(...items);
+  set items(value: HTMLElement[] | undefined | null) {
+    if (!value || value.length === 0) {
+      this.basketListElement.innerHTML = 'Корзина пуста'
+      this.basketListElement.classList.add('basket__list-disabled')
+      this.basketButtonOrderElement.disabled = true
+    } else {
+      this.basketListElement.replaceChildren(...value)
+      this.basketListElement.classList.remove('basket__list-disabled')
+      this.basketButtonOrderElement.disabled = false
+    }
   }
 
   set total(value: number) {
-    this.priceElement.textContent = `${value} синапсов`;
-  }
-
-  set disabled(value: boolean) {
-    this.button.disabled = value;
+    this.basketPriceElement.textContent = `${value} синапсов`
   }
 }

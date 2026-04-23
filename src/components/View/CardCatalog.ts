@@ -1,40 +1,29 @@
-import { ProductCard } from './ProductCard';
-import { ensureElement } from '../../utils/utils';
-import { categoryMap } from '../../utils/constants';
-
-type CategoryKey = keyof typeof categoryMap;
-
-interface ICardActions {
-  onClick?: (event: MouseEvent) => void;
-}
+import { ProductCard } from "./ProductCard";
+import { IProduct } from "../../types";
+import { IEvents } from "../base/Events";
+import { ensureElement } from "../../utils/utils";
+import { categoryMap, CDN_URL } from "../../utils/constants";
 
 export class CardCatalog extends ProductCard {
-  protected categoryElement: HTMLElement;
+  protected category: HTMLElement;
+  protected image: HTMLImageElement;
 
-  constructor(container: HTMLElement, actions?: ICardActions) {
-    super(container);
+  constructor(protected events: IEvents, onClick: () => void) {
+    super(events, "#card-catalog");
 
-    this.categoryElement = ensureElement<HTMLElement>(
-      '.card__category',
-      this.container
-    );
+    this.category = ensureElement<HTMLElement>(".card__category", this.container);
+    this.image = ensureElement<HTMLImageElement>(".card__image", this.container);
 
-    if (actions?.onClick) {
-      this.container.addEventListener('click', actions.onClick);
-    }
+    this.container.addEventListener("click", onClick);
   }
 
-  set category(value: string) {
-    this.categoryElement.textContent = value;
+  render(product: IProduct): HTMLElement {
+    this.renderBase(product);
 
-    Object.values(categoryMap).forEach((className) => {
-      this.categoryElement.classList.remove(className);
-    });
+    this.category.className = `card__category ${categoryMap[product.category as keyof typeof categoryMap]}`;
+    this.category.textContent = product.category;
+    this.setImage(this.image, `${CDN_URL}/${product.image}`, product.title);
 
-    const key = value as CategoryKey;
-
-    if (categoryMap[key]) {
-      this.categoryElement.classList.add(categoryMap[key]);
-    }
+    return this.container;
   }
 }

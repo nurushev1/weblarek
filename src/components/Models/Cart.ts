@@ -1,52 +1,44 @@
-import { IProduct } from "../../types";
-import { IEvents } from "../base/Events";
+import { IProduct } from '../../types/index.ts'
+import { IEvents } from '../base/Events.ts'
 
 export class Cart {
-  private products: IProduct[];
-  private events: IEvents;
+  private products: IProduct[] = []
+  private events: IEvents
 
-  constructor(events: IEvents) {
-    this.products = [];
-    this.events = events;
+  constructor(events: IEvents){
+    this.events = events
   }
 
   getProducts(): IProduct[] {
-    return this.products;
+    return this.products
   }
 
-  addProduct(product: IProduct) {
-    this.products.push(product);
-
-    this.events.emit('cart:changed', {
-      products: this.products,
-    });
+  addProduct(product: IProduct): void {
+    this.products.push(product)
+    this.events.emit<IProduct[]>('cart:change', this.products.slice())
   }
 
-  removeProduct(id: string) {
-    this.products = this.products.filter((n) => n.id !== id);
-
-    this.events.emit('cart:changed', {
-      products: this.products,
-    });
+  removeProduct(product: IProduct): void {
+    this.products = this.products.filter(p => p.id !== product.id)
+    this.events.emit<IProduct[]>('cart:change', this.products.slice())
   }
 
-  clearCart() {
-    this.products = [];
-
-    this.events.emit('cart:changed', {
-      products: this.products,
-    });
+  clear(): void {
+    this.products = []
+    this.events.emit<IProduct[]>('cart:change', this.products.slice())
   }
 
-  getAllCost(): number {
-    return this.products.reduce((acc, el) => acc + (el.price ?? 0), 0);
+  getTotalPrice(): number {
+    return this.products.reduce((total, product) => {
+      return total + (product.price ?? 0)
+    }, 0)
   }
 
-  getQuantity(): number {
-    return this.products.length;
+  getItemCount(): number {
+    return this.products.length
   }
 
-  hasProduct(id: string): boolean {
-    return this.products.some((n) => n.id === id);
+  hasProduct(productId: string): boolean {
+    return this.products.some(product => product.id === productId)
   }
 }

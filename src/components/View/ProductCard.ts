@@ -1,47 +1,22 @@
-import { Component } from '../base/Component';
-import { ensureElement } from '../../utils/utils';
-import { CDN_URL } from '../../utils/constants';
+import { Component } from "../base/Component";
+import { IEvents } from "../base/Events";
+import { IProduct } from "../../types";
+import { cloneTemplate, ensureElement } from "../../utils/utils";
 
-interface IProductCard {
-  title: string;
-  price: number | null;
-  image: string;
-}
+export abstract class ProductCard extends Component<IProduct> {
+  protected price: HTMLElement;
+  protected title: HTMLElement;
 
-export abstract class ProductCard extends Component<IProductCard> {
-  protected titleElement: HTMLElement;
-  protected priceElement: HTMLElement;
-  protected imageElement: HTMLImageElement;
-
-  constructor(container: HTMLElement) {
-    super(container);
-
-    this.titleElement = ensureElement<HTMLElement>(
-      '.card__title',
-      this.container
-    );
-
-    this.priceElement = ensureElement<HTMLElement>(
-      '.card__price',
-      this.container
-    );
-
-    this.imageElement = ensureElement<HTMLImageElement>(
-      '.card__image',
-      this.container
-    );
+  constructor(protected evt: IEvents, template: string) {
+    super(cloneTemplate<HTMLElement>(template));
+    this.price = ensureElement<HTMLElement>(".card__price", this.container);
+    this.title = ensureElement<HTMLElement>(".card__title", this.container);
   }
 
-  set title(value: string) {
-    this.titleElement.textContent = value;
+  protected renderBase(product: IProduct): void {
+    this.title.textContent = product.title;
+    this.price.textContent = product.price ? `${product.price} синапсов` : "Бесценно";
   }
 
-  set price(value: number | null) {
-    this.priceElement.textContent =
-      value === null ? 'Бесценно' : `${value} ₽`;
-  }
-
-  set image(value: string) {
-    this.imageElement.src = CDN_URL + value;
-  };
+  abstract render(product: IProduct): HTMLElement;
 }
