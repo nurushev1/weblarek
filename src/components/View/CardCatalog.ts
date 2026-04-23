@@ -5,24 +5,38 @@ import { ensureElement } from "../../utils/utils";
 import { categoryMap, CDN_URL } from "../../utils/constants";
 
 export class CardCatalog extends ProductCard {
-  protected category: HTMLElement;
-  protected image: HTMLImageElement;
+  protected categoryElement: HTMLElement;
+  protected imageElement: HTMLImageElement;
 
-  constructor(protected events: IEvents, onClick: () => void) {
+  constructor(protected events: IEvents, onSelect: () => void) {
     super(events, "#card-catalog");
 
-    this.category = ensureElement<HTMLElement>(".card__category", this.container);
-    this.image = ensureElement<HTMLImageElement>(".card__image", this.container);
+    this.categoryElement = ensureElement<HTMLElement>(
+      ".card__category",
+      this.container
+    );
 
-    this.container.addEventListener("click", onClick);
+    this.imageElement = ensureElement<HTMLImageElement>(
+      ".card__image",
+      this.container
+    );
+
+    this.container.addEventListener("click", onSelect);
   }
 
   render(product: IProduct): HTMLElement {
-    this.renderBase(product);
+    this.setBaseData(product);
 
-    this.category.className = `card__category ${categoryMap[product.category as keyof typeof categoryMap]}`;
-    this.category.textContent = product.category;
-    this.setImage(this.image, `${CDN_URL}/${product.image}`, product.title);
+    this.categoryElement.className =
+      `card__category ${categoryMap[product.category as keyof typeof categoryMap]}`;
+
+    this.categoryElement.textContent = product.category;
+
+    this.setImage(
+      this.imageElement,
+      `${CDN_URL}/${product.image}`,
+      product.title
+    );
 
     return this.container;
   }

@@ -5,38 +5,61 @@ import { IProduct } from "../../types";
 import { categoryMap, CDN_URL } from "../../utils/constants";
 
 export class PreviewCard extends ProductCard {
-  protected category: HTMLElement;
-  protected image: HTMLImageElement;
-  protected description: HTMLElement;
-  protected cardButtonElement: HTMLButtonElement;
+  protected categoryElement: HTMLElement;
+  protected imageElement: HTMLImageElement;
+  protected descriptionElement: HTMLElement;
+  protected actionButton: HTMLButtonElement;
 
-  constructor(protected events: IEvents, onButtonClick: () => void) {
+  constructor(protected events: IEvents, onAction: () => void) {
     super(events, "#card-preview");
 
-    this.image = ensureElement<HTMLImageElement>(".card__image", this.container);
-    this.category = ensureElement<HTMLElement>(".card__category", this.container);
-    this.description = ensureElement<HTMLElement>(".card__text", this.container);
-    this.cardButtonElement = ensureElement<HTMLButtonElement>(".card__button", this.container);
+    this.imageElement = ensureElement<HTMLImageElement>(
+      ".card__image",
+      this.container
+    );
 
-    this.cardButtonElement.addEventListener("click", onButtonClick);
+    this.categoryElement = ensureElement<HTMLElement>(
+      ".card__category",
+      this.container
+    );
+
+    this.descriptionElement = ensureElement<HTMLElement>(
+      ".card__text",
+      this.container
+    );
+
+    this.actionButton = ensureElement<HTMLButtonElement>(
+      ".card__button",
+      this.container
+    );
+
+    this.actionButton.addEventListener("click", onAction);
   }
 
   render(product: IProduct): HTMLElement {
-    this.renderBase(product);
+    this.setBaseData(product);
 
-    this.category.className = `card__category ${categoryMap[product.category as keyof typeof categoryMap]}`;
-    this.category.textContent = product.category;
-    this.setImage(this.image, `${CDN_URL}/${product.image}`, product.title);
+    this.categoryElement.className =
+      `card__category ${categoryMap[product.category as keyof typeof categoryMap]}`;
 
-    this.description.textContent = product.description;
+    this.categoryElement.textContent = product.category;
+
+    this.setImage(
+      this.imageElement,
+      `${CDN_URL}/${product.image}`,
+      product.title
+    );
+
+    this.descriptionElement.textContent = product.description;
+
     return this.container;
   }
 
-  setButtonText(text: string): void {
-    this.cardButtonElement.textContent = text;
+  setActionText(text: string): void {
+    this.actionButton.textContent = text;
   }
 
-  setButtonDisabled(disabled: boolean): void {
-    this.cardButtonElement.disabled = disabled;
+  setActionDisabled(disabled: boolean): void {
+    this.actionButton.disabled = disabled;
   }
 }

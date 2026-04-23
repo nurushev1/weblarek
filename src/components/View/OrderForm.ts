@@ -4,35 +4,57 @@ import { IEvents } from "../base/Events"
 import { Form } from "./Form";
 
 export class OrderForm extends Form {
-  protected formAddressInputElement: HTMLInputElement
-  protected formCardPayButtonElement: HTMLButtonElement
-  protected formCashPayButtonElement: HTMLButtonElement
+  protected addressInput: HTMLInputElement
+  protected cardButton: HTMLButtonElement
+  protected cashButton: HTMLButtonElement
 
   constructor(container: HTMLElement, events: IEvents) {
     super(container, events)
 
-    this.formCardPayButtonElement = ensureElement<HTMLButtonElement>('[name="card"]', this.container)
-    this.formCashPayButtonElement = ensureElement<HTMLButtonElement>('[name="cash"]', this.container)
-    this.formAddressInputElement = ensureElement<HTMLInputElement>('[name="address"]', this.container)
+    this.cardButton = ensureElement<HTMLButtonElement>(
+      '[name="card"]',
+      this.container
+    )
 
-    this.formCardPayButtonElement.addEventListener('click', () => {
-      this.events.emit('payment:change', { payment: 'card' })
+    this.cashButton = ensureElement<HTMLButtonElement>(
+      '[name="cash"]',
+      this.container
+    )
+
+    this.addressInput = ensureElement<HTMLInputElement>(
+      '[name="address"]',
+      this.container
+    )
+
+    this.cardButton.addEventListener('click', () => {
+      this.events.emit('order:change', { payment: 'card' })
     })
-    this.formCashPayButtonElement.addEventListener('click', () => {
-      this.events.emit('payment:change', { payment: 'cash' })
+
+    this.cashButton.addEventListener('click', () => {
+      this.events.emit('order:change', { payment: 'cash' })
     })
-    this.formAddressInputElement.addEventListener('input', () => {
-      this.events.emit('address:change', { address: this.formAddressInputElement.value })
+
+    this.addressInput.addEventListener('input', () => {
+      this.events.emit('order:change', {
+        address: this.addressInput.value
+      })
     })
   }
 
-  setAddress(value: string): void {
-  this.formAddressInputElement.value = value
+  setAddressValue(value: string): void {
+    this.addressInput.value = value
   }
 
-  togglePaymentButtonStatus(status: TPayment): void {
-    this.formCardPayButtonElement.classList.toggle('button_alt-active', status === 'card')
-    this.formCashPayButtonElement.classList.toggle('button_alt-active', status === 'cash')
+  setPaymentMethod(status: TPayment): void {
+    this.cardButton.classList.toggle(
+      'button_alt-active',
+      status === 'card'
+    )
+
+    this.cashButton.classList.toggle(
+      'button_alt-active',
+      status === 'cash'
+    )
   }
 
   protected onSubmit(): void {

@@ -4,20 +4,30 @@ import { IEvents } from "../base/Events";
 import { ProductCard } from "./ProductCard";
 
 export class BasketCard extends ProductCard {
-  protected cardIndexElement: HTMLElement;
-  protected cardButtonRemoveElement: HTMLButtonElement;
+  protected index: HTMLElement;
+  protected removeButton: HTMLButtonElement;
 
-  constructor(protected events: IEvents, onRemoveClick: () => void) {
+  constructor(protected events: IEvents, onRemove: () => void) {
     super(events, "#card-basket");
 
-    this.cardIndexElement = ensureElement<HTMLElement>(".basket__item-index", this.container);
-    this.cardButtonRemoveElement = ensureElement<HTMLButtonElement>(".basket__item-delete", this.container);
-    this.cardButtonRemoveElement.addEventListener("click", onRemoveClick);
+    this.index = ensureElement<HTMLElement>(
+      ".basket__item-index",
+      this.container
+    );
+
+    this.removeButton = ensureElement<HTMLButtonElement>(
+      ".basket__item-delete",
+      this.container
+    );
+
+    this.removeButton.addEventListener("click", onRemove);
   }
 
   render(product: IProduct & { index?: number }): HTMLElement {
-    this.renderBase(product);
-    this.cardIndexElement.textContent = String((product.index || 0) + 1);
+    this.setBaseData(product);
+
+    this.index.textContent = String((product.index ?? 0) + 1);
+
     return this.container;
   }
 }

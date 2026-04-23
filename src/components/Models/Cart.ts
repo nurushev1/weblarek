@@ -2,43 +2,43 @@ import { IProduct } from '../../types/index.ts'
 import { IEvents } from '../base/Events.ts'
 
 export class Cart {
-  private products: IProduct[] = []
+  private items: IProduct[] = []
   private events: IEvents
 
-  constructor(events: IEvents){
+  constructor(events: IEvents) {
     this.events = events
   }
 
-  getProducts(): IProduct[] {
-    return this.products
+  getItems(): IProduct[] {
+    return this.items
   }
 
-  addProduct(product: IProduct): void {
-    this.products.push(product)
-    this.events.emit<IProduct[]>('cart:change', this.products.slice())
+  addItem(product: IProduct): void {
+    this.items.push(product)
+    this.events.emit<IProduct[]>('cart:change', this.items.slice())
   }
 
-  removeProduct(product: IProduct): void {
-    this.products = this.products.filter(p => p.id !== product.id)
-    this.events.emit<IProduct[]>('cart:change', this.products.slice())
+  removeItem(product: IProduct): void {
+    this.items = this.items.filter(p => p.id !== product.id)
+    this.events.emit<IProduct[]>('cart:change', this.items.slice())
   }
 
-  clear(): void {
-    this.products = []
-    this.events.emit<IProduct[]>('cart:change', this.products.slice())
+  clearCart(): void {
+    this.items = []
+    this.events.emit<IProduct[]>('cart:change', this.items.slice())
   }
 
-  getTotalPrice(): number {
-    return this.products.reduce((total, product) => {
+  getTotal(): number {
+    return this.items.reduce((total, product) => {
       return total + (product.price ?? 0)
     }, 0)
   }
 
-  getItemCount(): number {
-    return this.products.length
+  getCount(): number {
+    return this.items.length
   }
 
-  hasProduct(productId: string): boolean {
-    return this.products.some(product => product.id === productId)
+  contains(productId: string): boolean {
+    return this.items.some(product => product.id === productId)
   }
 }

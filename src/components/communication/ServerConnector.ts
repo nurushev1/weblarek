@@ -1,14 +1,14 @@
 import { IApi, IProduct, IOrderRequest, IOrderResponse } from "../../types/index.ts";
 
 export class ServerConnector {
-    constructor(private readonly api: IApi) {}
+    constructor(private readonly httpClient: IApi) {}
 
-    async fetchProducts(): Promise<IProduct[]> {
-        const response = await this.api.get<{ items: IProduct[] }>("/product/")
-        return response.items
+    async getProducts(): Promise<IProduct[]> {
+        const result = await this.httpClient.get<{ products: IProduct[] }>("/product/");
+        return result.products;
     }
 
-    async createOrder(order: IOrderRequest): Promise<IOrderResponse> {
-        return this.api.post<IOrderResponse>('/order/', order)
+    async postOrder(order: IOrderRequest): Promise<IOrderResponse> {
+        return this.httpClient.post<IOrderResponse>('/order/', order);
     }
 }
