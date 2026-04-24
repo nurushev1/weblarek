@@ -26,8 +26,6 @@ import { BasketCard } from './components/View/BasketCard';
 import { OrderForm } from './components/View/OrderForm';
 import { ContactsForm } from './components/View/ContactsForm';
 
-// ===================== INIT =====================
-
 const events = new EventEmitter();
 
 const http = new Api(API_URL);
@@ -36,8 +34,6 @@ const apiClient = new ServerConnector(http);
 const productCatalog = new ProductCatalog(events);
 const shoppingCart = new Cart(events);
 const checkout = new Buyer(events);
-
-// ===================== DOM =====================
 
 const galleryEl = ensureElement<HTMLElement>('.gallery');
 const modalEl = ensureElement<HTMLElement>('.modal');
@@ -59,12 +55,12 @@ const success = new Success(cloneTemplate(successTpl), events);
 
 apiClient.getProducts()
   .then(products => {
-    productCatalog.setItems(products);
+    productCatalog.setProducts(products);
   })
-  .catch(error => console.error("Ошибка API:", error));
+  .catch(console.error);
 
 events.on('catalog:change', () => {
-  const products = productCatalog.getItems();
+  const products = productCatalog.getProducts();
 
   const cards = products.map(product => {
     const card = new CardCatalog(events, () => {
@@ -78,15 +74,15 @@ events.on('catalog:change', () => {
 });
 
 events.on('product:select', (product: IProduct) => {
-  productCatalog.selectItem(product);
+  productCatalog.setSelectedProduct(product);
 });
 
 events.on('catalog:item-selected', (product: IProduct) => {
   const preview = new PreviewCard(events, () => {
-    if (shoppingCart.contains(product.id)) {
-      shoppingCart.removeItem(product);
+    if (shoppingCart.hasProduct(product.id)) {
+      shoppingCart.removeProduct(product.id);
     } else {
-      shoppingCart.addItem(product);
+      shoppingCart.addProduct(product);
     }
     uiModal.close();
   });
@@ -100,7 +96,7 @@ events.on('catalog:item-selected', (product: IProduct) => {
     preview.setActionDisabled(false);
 
     preview.setActionText(
-      shoppingCart.contains(product.id)
+      shoppingCart.hasProduct(product.id)
         ? 'Удалить из корзины'
         : 'Купить'
     );
@@ -114,23 +110,23 @@ events.on('cart:open', () => {
 });
 
 events.on('cart:change', () => {
-  appHeader.counter = shoppingCart.getCount();
+  appHeader.counter = shoppingCart.getQuantity();
 
-  const items = shoppingCart.getItems().map((product, index) => {
+  const items = shoppingCart.getProducts().map((product, index) => {
     return new BasketCard(events, () => {
-      shoppingCart.removeItem(product);
+      shoppingCart.removeProduct(product.id);
     }).render({ ...product, index });
   });
 
   basket.render({
     items,
-    total: shoppingCart.getTotal()
+    total: shoppingCart.getAllCost()
   });
 });
 
 events.on('basket:order', () => {
-  const errors = checkout.validate();
-  const data = checkout.getBuyerData();
+  const errors = checkout.validateData();
+  const data = checkout.getData();
 
   orderForm.setError(
     [errors.payment, errors.address].filter(Boolean).join('. ')
@@ -144,13 +140,12 @@ events.on('basket:order', () => {
 });
 
 events.on('order:change', (data: { payment?: TPayment; address?: string }) => {
-  if (data.payment) checkout.setPaymentMethod(data.payment);
-  if (data.address) checkout.setAddress(data.address);
+  checkout.setData(data);
 });
 
 events.on('order:submit', () => {
-  const errors = checkout.validate();
-  const data = checkout.getBuyerData();
+  const errors = checkout.validateData();
+  const data = checkout.getData();
 
   contactsForm.setError(
     [errors.email, errors.phone].filter(Boolean).join('. ')
@@ -164,13 +159,12 @@ events.on('order:submit', () => {
 });
 
 events.on('contacts:change', (data: { email?: string; phone?: string }) => {
-  if (data.email) checkout.setEmail(data.email);
-  if (data.phone) checkout.setPhone(data.phone);
+  checkout.setData(data);
 });
 
 events.on('buyer:changed', () => {
-  const errors = checkout.validate();
-  const data = checkout.getBuyerData();
+  const errors = checkout.validateData();
+  const data = checkout.getData();
 
   orderForm.setError(
     [errors.payment, errors.address].filter(Boolean).join('. ')
@@ -191,24 +185,20 @@ events.on('buyer:changed', () => {
 
 events.on('contacts:submit', () => {
   const orderData: IOrderRequest = {
-    ...checkout.getBuyerData(),
-    items: shoppingCart.getItems().map(p => p.id),
-    total: shoppingCart.getTotal()
+    ...checkout.getData(),
+    items: shoppingCart.getProducts().map(p => p.id),
+    total: shoppingCart.getAllCost()
   };
 
   apiClient.postOrder(orderData)
     .then(result => {
-      if (!result) return;
-
       shoppingCart.clearCart();
-      checkout.reset();
+      checkout.clearData();
 
       success.setTotal(result.total);
       uiModal.open(success.render());
     })
-    .catch(error => {
-      console.error('Ошибка оформления заказа:', error);
-    });
+    .catch(console.error);
 });
 
 events.on('success:close', () => {

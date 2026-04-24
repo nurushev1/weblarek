@@ -2,33 +2,33 @@ import { IProduct } from '../../types/index.ts'
 import { IEvents } from '../base/Events.ts'
 
 export class ProductCatalog {
-  private items: IProduct[] = []
-  private selected: IProduct | null = null
+  private products: IProduct[] = []
+  private selectedProduct: IProduct | null = null
   private events: IEvents
 
   constructor(events: IEvents) {
     this.events = events
   }
 
-  setItems(items: IProduct[]): void {
-    this.items = items.slice()
-    this.events.emit<IProduct[]>('catalog:change', this.items.slice())
+  setProducts(products: IProduct[]): void {
+    this.products = products.slice()
+    this.events.emit<IProduct[]>('catalog:change', this.products.slice())
   }
 
-  getItems(): IProduct[] {
-    return this.items
+  getProducts(): IProduct[] {
+    return this.products
   }
 
-  getItem(id: string): IProduct | undefined {
-    return this.items.find(el => el.id === id)
+  getProductById(id: string): IProduct | undefined {
+    return this.products.find(el => el.id === id)
   }
 
-  selectItem(item: IProduct): void {
-    this.selected = item
-    this.events.emit<IProduct>('catalog:item-selected', item)
+  setSelectedProduct(product: IProduct): void {
+    this.selectedProduct = product
+    this.events.emit<IProduct>('catalog:item-selected', product)
   }
 
-  getSelected(): IProduct | null {
-    return this.selected
+  getSelectedProduct(): IProduct | null {
+    return this.selectedProduct
   }
 }
